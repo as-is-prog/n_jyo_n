@@ -9,3 +9,4 @@ edition = "2021"
 yew = "0.19"
 getrandom = { version = "0.2", features = ["js"] }
 rand = "0.8.3"
+urlencoding = "2.1.0"

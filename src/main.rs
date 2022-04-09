@@ -1,6 +1,51 @@
 use yew::prelude::*;
+use yew::{Component, Context, html, Html};
 use rand::Rng;
 use core::ops::Range;
+use urlencoding;
+
+pub enum UIMsg {
+    Clicked
+}
+
+struct MyComponent {
+}
+
+impl Component for MyComponent {
+    type Message = UIMsg;
+    type Properties = ();
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {
+        }
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            UIMsg::Clicked => {
+                return true // Re-render
+            }
+        }
+    }
+
+    fn view(&self, _ctx: &Context<Self>) -> Html {
+        let kanji_val_range = 1..101;
+        let hiragana_val_range = 1..101;
+
+        let zen = format!("{0}条禅", &rand_val_kanji(kanji_val_range.clone()));
+        let nanako = format!("{0}条{1}こ", &rand_val_kanji(kanji_val_range.clone()), &rand_val_hiragana(hiragana_val_range.clone()));
+
+        html!{
+            <div>
+                <h1>{ zen }</h1>
+                <h1>{ nanako }</h1>
+                <br/>
+                <button onclick={_ctx.link().callback(|_| UIMsg::Clicked)}>{ "リロール" }</button>
+            </div>
+        }
+    }
+
+}
 
 fn num_to_str(num: i32, str_nums: &[&str; 10], str_jyu: &str, str_hyaku: &str) -> String {
     if num == 100 {return String::from(str_hyaku);}
@@ -66,10 +111,7 @@ fn rand_val_kanji(val_range: Range<i32>) -> String {
 #[function_component(App)]
 fn app() -> Html {
     html! {
-            <div>
-                <h1>{ format!("{0}条禅", &rand_val_kanji(1..101)) }</h1>
-                <h1>{ format!("{0}条{1}こ", &rand_val_kanji(1..101), &rand_val_hiragana(1..101)) }</h1>
-            </div>
+        <MyComponent/>
     }
 }
 
