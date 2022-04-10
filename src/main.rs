@@ -32,15 +32,61 @@ impl Component for MyComponent {
         let kanji_val_range = 1..101;
         let hiragana_val_range = 1..101;
 
-        let zen = format!("{0}条禅", &rand_val_kanji(kanji_val_range.clone()));
-        let nanako = format!("{0}条{1}こ", &rand_val_kanji(kanji_val_range.clone()), &rand_val_hiragana(hiragana_val_range.clone()));
+        let zen_base_app = 160;
+        let zen_number = rand::thread_rng().gen_range(kanji_val_range.clone());
+        let zen_app = zen_number * zen_base_app;
+
+        let nanako_base_str = 15;
+        let nanako_base_number = 7;
+        let nanako_number = rand::thread_rng().gen_range(hiragana_val_range.clone());
+        let nanako_str = ((nanako_number * nanako_base_str)/nanako_base_number) as i32;
+
+        let zen = format!("{0}条禅", &num_to_kanji(zen_number));
+        let nanako = format!("{0}条{1}こ", &rand_val_kanji(kanji_val_range.clone()), &num_to_hiragana(nanako_number));
+
+        let zen_urlenc = urlencoding::encode(&zen);
+        let nanako_urlenc = urlencoding::encode(&nanako);
+
+        let tweet_url = format!("https://twitter.com/intent/tweet?text={0}%0A{1}%0A%0Ahttps%3A%2F%2Fas-is-prog.github.io%2Fn_jyo_n%2F",
+                                       zen_urlenc,
+                                       nanako_urlenc);
 
         html!{
-            <div>
-                <h1>{ zen }</h1>
-                <h1>{ nanako }</h1>
-                <br/>
-                <button onclick={_ctx.link().callback(|_| UIMsg::Clicked)}>{ "リロール" }</button>
+            <div class="container">
+            <div class="row">
+                <div class="col card">
+                    <div class="card-body">
+                        <h3 class="card-title">{ "1d100条禅生成(1d100条いちdひゃくこにも対応)" }</h3>
+                        <button class="btn btn-secondary" onclick={_ctx.link().callback(|_| UIMsg::Clicked)}>{ "リロール" }</button>
+                        <br/>
+                        <br/>
+                        <a class="btn btn-primary" href={tweet_url} target="_blank" rel="noopener noreferrer">
+                            { "ツイート" }
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+                <div class="row">
+                    <div class="col card">
+                        // <div class="card-img-top" style="height: 200px; width: 18rem; backglound-color: #99cc00;"/>
+                        <div class="card-body">
+                            <h4 class="card-title">{ zen }</h4>
+                            <p class="card-text">{format!("今のAPPは{}です。", zen_app)}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col card">
+                        // <div class="card-img-top" style="height: 200px; width: 18rem; backglound-color: #99cc00;"/>
+                        <div class="card-body">
+                            <h4 class="card-title">{ nanako }</h4>
+                            <p class="card-text">{format!("今のSTRは{}です。", nanako_str)}</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         }
     }
@@ -92,13 +138,6 @@ fn num_to_kanji(num: i32) -> String {
     ];
 
     return num_to_str(num, &hiragana_nums, hiragana_jyu, hiragana_hyaku);
-}
-
-fn rand_val_hiragana(val_range: Range<i32>) -> String {
-    let secret_number = rand::thread_rng().gen_range(val_range);
-    let hiragana_number = num_to_hiragana(secret_number);
-
-    return format!("{hiragana_number}");
 }
 
 fn rand_val_kanji(val_range: Range<i32>) -> String {
